@@ -1,10 +1,12 @@
 import torch
+
 from torch.optim.adam import Adam
 import matplotlib.pyplot as plt
 from GymnasiumContinuousStochasticAgent import GymnasiumAgent
 from GymnasiumSACEnvironment import GymnasiumEnvironment
 from GymnasiumSACTrainer import GymnasiumSACTrainer
 from InvPendulumSACNetwork import *
+
 
 gamma = 0.99
 train_epsilon = 1
@@ -48,20 +50,24 @@ if do_train:
         lr=lr,
         batch_size=batch_size
     )
-    trainer.plotter.save("log/InvPendulum_SAC_2.json")
-    torch.save(policy_net.state_dict(), "log/InvPendulum_policy_SAC_2.pth")
-    torch.save(value_net.state_dict(), "log/InvPendulum_value_SAC_2.pth")
-    torch.save(q_net_1.state_dict(), "log/InvPendulum_q1_SAC_2.pth")
-    torch.save(q_net_2.state_dict(), "log/InvPendulum_q2_SAC_2.pth")
+    trainer.plotter.save("./RL/log/InvPendulum_SAC_1.json")
+    torch.save(policy_net.state_dict(), "./RL/log/InvPendulum_policy_SAC_1.pth")
+    torch.save(value_net.state_dict(), "./RL/log/InvPendulum_value_SAC_1.pth")
+    torch.save(q_net_1.state_dict(), "./RL/log/InvPendulum_q1_SAC_1.pth")
+    torch.save(q_net_2.state_dict(), "./RL/log/InvPendulum_q2_SAC_1.pth")
+
+    policy_net.logger.save()
 
     environment.env.close()
 
 if test:
     # test
-    policy_net.load_state_dict(torch.load("log/InvPendulum_policy_SAC_2.pth"))
-    value_net.load_state_dict(torch.load("log/InvPendulum_value_SAC_2.pth"))
-    q_net_1.load_state_dict(torch.load("log/InvPendulum_q1_SAC_2.pth"))
-    q_net_2.load_state_dict(torch.load("log/InvPendulum_q2_SAC_2.pth"))
+    policy_net.logger.reset()
+
+    policy_net.load_state_dict(torch.load("./RL/log/InvPendulum_policy_SAC_1.pth"))
+    value_net.load_state_dict(torch.load("./RL/log/InvPendulum_value_SAC_1.pth"))
+    q_net_1.load_state_dict(torch.load("./RL/log/InvPendulum_q1_SAC_1.pth"))
+    q_net_2.load_state_dict(torch.load("./RL/log/InvPendulum_q2_SAC_1.pth"))
 
     environment = GymnasiumEnvironment("InvertedPendulum-v4", discount_factor=gamma, render_mode="human")
     agent = GymnasiumAgent(environment.env.action_space, policy_net, test=True)
@@ -75,5 +81,7 @@ if test:
 
     except KeyboardInterrupt:
         print("terminated")
+
+    policy_net.logger.save("./RL/test_data/")
 
     environment.env.close()

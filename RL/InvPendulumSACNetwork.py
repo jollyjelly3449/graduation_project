@@ -1,19 +1,23 @@
-import torch
-import torch.nn as nn
-from RLFramework.Network import Network
+from RLFramework.Network import *
+from logger import Logger
 
 
 class InvPendulumPolicyNetwork(Network):
     def __init__(self):
         super().__init__()
-        self.model = nn.Sequential(
+        self.first = nn.Sequential(
             nn.BatchNorm1d(4),
             nn.Linear(4, 256),
-            nn.LeakyReLU(),
+            nn.LeakyReLU())
+
+        self.second = nn.Sequential(
             nn.Linear(256, 256),
-            nn.LeakyReLU(),
-            nn.Linear(256, 2)
+            nn.LeakyReLU()
         )
+
+        self.last = nn.Linear(256, 2)
+
+        self.logger = Logger("./RL/data/", slots=["state", "first", "second", "last"])
 
         def init_weights(m):
             if isinstance(m, nn.Linear):
@@ -64,7 +68,20 @@ class InvPendulumPolicyNetwork(Network):
         else:
             unbatched = False
 
-        x = self.model(x)
+        if unbatched:
+            self.logger.append(state=x)
+
+        x = self.first(x)
+        if unbatched:
+            self.logger.append(first=x)
+
+        x = self.second(x)
+        if unbatched:
+            self.logger.append(second=x)
+
+        x = self.last(x)
+        if unbatched:
+            self.logger.append(last=x)
 
         if unbatched:
             x = x.reshape(-1)
