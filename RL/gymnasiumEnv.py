@@ -42,10 +42,12 @@ class GymnasiumEnvironment(RLEnvironment):
 
     def reward(self, state, action, next_state):
         # print(self.gym_reward)
-        self.episode_reward += self.gym_reward
+        self.episode_reward += self.gym_reward - state[0] ** 2
         self.discount_reward = self.discount_reward * self.discount_factor + self.gym_reward
 
-        return self.gym_reward
+        # print(state, self.gym_reward - state[0] ** 2)
+
+        return self.gym_reward - state[0] ** 2
 
     def reset_params(self):
         self.gym_reward = 0

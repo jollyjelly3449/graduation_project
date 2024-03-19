@@ -5,8 +5,7 @@ from RLFramework import *
 from gymnasiumEnv import GymnasiumEnvironment
 from InvPendulumNCPNets import *
 
-
-env = GymnasiumEnvironment("InvertedPendulum-v4", render_mode="human")
+env = GymnasiumEnvironment("InvertedPendulum-v4")#, render_mode="human")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -19,7 +18,7 @@ value = InvPendulumValueNet(
     tau=0.01
 ).to(device=device)
 
-agent = RLAgent(policy=policy, greedy=True)
+agent = RLAgent(policy=policy)
 
 trainer = RLTrainer(
     agent=agent,
@@ -29,18 +28,25 @@ trainer = RLTrainer(
         ClippedSurrogatePolicyOptim(lr=3e-4, epoch=30, gamma=0.99, epsilon=0.2,
                                     lamda=0.95, entropy_weight=0.005, use_target_v=False, random_sample=False)
     ],
-    logger=Logger(realtime_plot=False, rewards={"reward_sum": "env.episode_reward",
+    logger=Logger(realtime_plot=True, rewards={"reward_sum": "env.episode_reward",
                                                "decay_reward": "env.discount_reward"}, window_size=800),
     pi=policy,
     v=value,
     memory=VolatileMemory()
 )
 
-trainer.load("./RL/saved/InvPendulumPPO_NCP_", version=0)
+trainer.load("./RL/saved/InvPendulumPPO_NCP", version="2_2")
 
-# trainer.add_interval(trainer.train, episode=20)
-# trainer.add_interval(value.update_target_network, step=1, minimum=100)
+trainer.add_interval(trainer.train, episode=1, step=200)
+trainer.add_interval(value.update_target_network, step=1)
 
-trainer.run()
 
-trainer.save("./RL/saved/InvPendulumPPO_NCP_", version=1)
+def random_action():
+    trainer.force_action(np.array([np.tanh(np.random.randn() / 3) * 3]))
+
+
+trainer.add_interval(random_action, step=200)
+
+trainer.run(test_mode=False)
+
+trainer.save("./RL/saved/InvPendulumPPO_NCP", version="2_2")
