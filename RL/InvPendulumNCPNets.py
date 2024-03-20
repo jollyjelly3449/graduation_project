@@ -2,18 +2,24 @@ import numpy as np
 import torch
 import torch.nn as nn
 from ncps.wirings import AutoNCP
-from ncps.torch import CfC
+# from ncps.torch import CfC
+from cfc import CfC
 from RLFramework.net import *
 
 
 # version 0: CfC(4, 50), ReLU(), Linear(50,2), train freq 2000 step
 # version 1: CfC(4, AutoNCP(16, 2)), train freq 200 step, 1 episode
-# version 2: CfC(4, AutoNCP(8, 2)), train same
+# version 2: CfC(4, AutoNCP(16, 2)), train same
 # version 2_1: network same as 2, reward changed
+# version 3: AutoNCP(8, 2)
+# version 4: AutoNCP(20, 2)
+# version 5: AutoNCP(20, 2), reward 1 - 2 * abs(pos)
+# version 6: AutoNCP(10, 2)
+
 
 class InvPendulumPolicyNet(PolicyNet):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, hx=torch.zeros((1, 16)), init_state=np.array([1]), **kwargs)
+        super().__init__(*args, hx=torch.zeros((1, 10)), init_state=np.array([1]), **kwargs)
 
         self.model = nn.Sequential(
             nn.Linear(4, 128),
@@ -33,7 +39,7 @@ class InvPendulumPolicyNet(PolicyNet):
         # wiring = AutoNCP(16, 2)
 
         # version 2
-        wiring = AutoNCP(16, 2)
+        wiring = AutoNCP(10, 2)
         self.rnn = CfC(input_size=4, units=wiring, batch_first=False)
 
     def forward(self, x):
@@ -49,9 +55,8 @@ class InvPendulumPolicyNet(PolicyNet):
                 if i == x.shape[0] or self.init_state[i]:
                     _x = x[last_index:i].reshape((i - last_index, 1, -1))
                     last_index = i
-                    hx = torch.zeros((1, 16)).to(x)
 
-                    _x, _ = self.rnn(_x, hx)
+                    _x, _ = self.rnn(_x)
                     _x = _x.reshape((_x.shape[0], -1))
                     outputs.append(_x)
 

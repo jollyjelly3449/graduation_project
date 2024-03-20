@@ -5,7 +5,7 @@ from RLFramework import *
 from gymnasiumEnv import GymnasiumEnvironment
 from InvPendulumNCPNets import *
 
-env = GymnasiumEnvironment("InvertedPendulum-v4")#, render_mode="human")
+env = GymnasiumEnvironment("InvertedPendulum-v4", render_mode="human")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -35,9 +35,9 @@ trainer = RLTrainer(
     memory=VolatileMemory()
 )
 
-trainer.load("./RL/saved/InvPendulumPPO_NCP", version="2_2")
+trainer.load("./RL/saved/InvPendulumPPO_NCP", version="6")
 
-trainer.add_interval(trainer.train, episode=1, step=200)
+trainer.add_interval(trainer.train, episode=4, step=200)
 trainer.add_interval(value.update_target_network, step=1)
 
 
@@ -45,8 +45,9 @@ def random_action():
     trainer.force_action(np.array([np.tanh(np.random.randn() / 3) * 3]))
 
 
-trainer.add_interval(random_action, step=200)
+trainer.add_interval(random_action, step=50)
 
-trainer.run(test_mode=False)
+trainer.run(test_mode=True)
 
-trainer.save("./RL/saved/InvPendulumPPO_NCP", version="2_2")
+# trainer.save("./RL/saved/InvPendulumPPO_NCP", version=6)
+# policy.rnn.rnn_cell.logger.save("./RL/data/v6/")

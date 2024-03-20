@@ -22,7 +22,7 @@ class TensorLogger(object):
             assert key in self.__slots, "key is not in slots."
             val = kwargs[key]
             if isinstance(val, torch.Tensor):
-                val = val.detach().cpu().numpy()
+                val = val.detach().cpu().numpy().copy()
             self.__memory[key].append(val)
 
     def save(self, path=None):
