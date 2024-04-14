@@ -1,8 +1,8 @@
-from RLFramework.Network import *
+from RLFramework.net import *
 from tensor_logger import TensorLogger
 
 
-class InvPendulumPolicyNetwork(Network):
+class InvPendulumPolicyNetwork(PolicyNet):
     def __init__(self):
         super().__init__()
         self.first = nn.Sequential(
@@ -91,7 +91,8 @@ class InvPendulumPolicyNetwork(Network):
 
         return x
 
-class InvPendulumNCPPolicyNetwork(Network):
+
+class InvPendulumNCPPolicyNetwork(PolicyNet):
     def __init__(self):
         super().__init__()
 
@@ -181,7 +182,7 @@ class InvPendulumNCPPolicyNetwork(Network):
 
         return x
 
-class InvPendulumQNetwork(Network):
+class InvPendulumQNetwork(QNet):
     def __init__(self):
         super().__init__()
         self.model = nn.Sequential(
@@ -217,7 +218,7 @@ class InvPendulumQNetwork(Network):
         return x
 
 
-class InvPendulumValueNetwork(Network):
+class InvPendulumValueNetwork(ValueNet):
     def __init__(self):
         super().__init__()
         self.model = nn.Sequential(

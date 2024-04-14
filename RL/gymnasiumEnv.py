@@ -1,9 +1,10 @@
 import numpy as np
 import gymnasium as gym
-from RLFramework import *
+import RLFramework as rl
+from gymnasium.wrappers import RecordVideo
 
 
-class GymnasiumEnvironment(RLEnvironment):
+class GymnasiumEnvironment(rl.Environment):
     def __init__(self, env_name: str, gamma=0.99, seed=None, **kwargs):
         self.env = gym.make(env_name, **kwargs)
         observation_space = self.convert_space(self.env.observation_space)
@@ -23,9 +24,9 @@ class GymnasiumEnvironment(RLEnvironment):
 
     def convert_space(self, gym_space):
         if isinstance(gym_space, gym.spaces.Discrete):
-            return Discrete(gym_space.n)
+            return rl.space.Discrete(gym_space.n)
         elif isinstance(gym_space, gym.spaces.Box):
-            return Continuous(
+            return rl.space.Continuous(
                 upper=np.array(gym_space.high),
                 lower=np.array(gym_space.low)
             )

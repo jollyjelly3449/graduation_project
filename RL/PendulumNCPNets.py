@@ -16,41 +16,35 @@ from tensor_logger import TensorLogger
 # version 4: AutoNCP(20, 2)
 # version 5: AutoNCP(20, 2), reward 1 - 2 * abs(pos)
 # version 6: AutoNCP(10, 2)
-# version 7: AutoNCP(20, 2), state 2
-# version 8: AutoNCP(20, 3), Linear(3,2)
 
-
-class InvPendulumPolicyNet(PolicyNet):
+class PendulumPolicyNet(PolicyNet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, hx=torch.zeros((1, 20)), init_state=np.array([1]), **kwargs)
 
         self.model = nn.Sequential(
-            nn.Linear(4, 128),
+            nn.Linear(3, 128),
             nn.ReLU(),
             nn.Linear(128, 128),
             nn.ReLU(),
             nn.Linear(128, 2)
         )
         # version 0
-        # self.rnn = CfC(input_size=4, units=50, batch_first=False) #nn.RNN(input_size=4, hidden_size=128, num_layers=3)
-        self.output = nn.Sequential(
-             nn.ReLU(),
-             nn.Linear(3, 2)
-        )
+        # self.rnn = CfC(input_size=3, units=50, batch_first=False) #nn.RNN(input_size=4, hidden_size=128, num_layers=3)
+        # self.output = nn.Sequential(
+        #     nn.ReLU(),
+        #     nn.Linear(50, 2)
+        # )
         # self.logger = TensorLogger("./RL/data/v0/", ['state', 'first', 'output'])
 
         # version 1
         # wiring = AutoNCP(16, 2)
 
         # version 2
-        self.wiring = AutoNCP(20, 3, seed=22222)
-        self.rnn = CfC(input_size=4, units=self.wiring, batch_first=False)
-
-        # self.rnn = nn.RNN(4, 20, batch_first=False)
+        wiring = AutoNCP(20, 2)
+        self.rnn = CfC(input_size=3, units=wiring, batch_first=False)
 
     def forward(self, x):
-        # x = self.model
-        # x = x[:, :2]
+        # x = self.model(x)
         if x.shape[0] != 1:
             outputs = []
             last_index = 0
@@ -69,7 +63,7 @@ class InvPendulumPolicyNet(PolicyNet):
 
             x = torch.cat(outputs)
 
-            x = self.output(x)
+            # x = self.output(x)
 
         else:
             self.init_state = self.init_state * 0
@@ -82,22 +76,22 @@ class InvPendulumPolicyNet(PolicyNet):
             # self.logger.append(first=x)
             x = x.reshape(1, -1)
 
-            x = self.output(x)
+            # x = self.output(x)
             # self.logger.append(output=x)
 
         return x
 
 
-class InvPendulumValueNet(ValueNet):
+class PendulumValueNet(ValueNet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.model = nn.Sequential(
-            nn.Linear(4,128),
+            nn.Linear(3, 128),
             nn.ReLU(),
-            nn.Linear(128,128),
+            nn.Linear(128, 128),
             nn.ReLU(),
-            nn.Linear(128,1)
+            nn.Linear(128, 1)
         )
 
     def forward(self, x):
@@ -113,4 +107,3 @@ class InvPendulumValueNet(ValueNet):
             x = x.reshape(-1)
 
         return x
-
