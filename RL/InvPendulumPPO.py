@@ -2,8 +2,8 @@ import torch
 import numpy as np
 
 import RLFramework as rl
-from gymnasiumEnv import GymnasiumEnvironment
-from InvPendulumNCPNets import *
+from gymnasiumPIDEnv import GymnasiumEnvironment
+from InvPendulumPIDNets import *
 
 
 env = GymnasiumEnvironment("InvertedPendulum-v4", render_mode='human')
@@ -35,7 +35,7 @@ trainer = rl.Trainer(
     memory=rl.traj.VolatileMemory()
 )
 
-trainer.load("./RL/saved/InvPendulumPPO_NCP", version=8)
+trainer.load("./RL/saved/InvPendulumPPO_PID", version=1)
 
 trainer.add_interval(trainer.train, episode=4, step=2000)
 trainer.add_interval(value.update_target_network, step=1)
@@ -58,6 +58,6 @@ trainer.run(test_mode=True)
 
 env.env.close()
 
-# trainer.save("./RL/saved/InvPendulumPPO_NCP", version=8)
+# trainer.save("./RL/saved/InvPendulumPPO_PID", version=1)
 # policy.rnn.rnn_cell.logger.save("./RL/data/v5_2/")
-# policy.logger.save("./RL/data/mlp_v1/")
+# policy.logger.save("./RL/data/v8/")

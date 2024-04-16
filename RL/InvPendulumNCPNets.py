@@ -37,7 +37,7 @@ class InvPendulumPolicyNet(PolicyNet):
              nn.ReLU(),
              nn.Linear(3, 2)
         )
-        # self.logger = TensorLogger("./RL/data/v0/", ['state', 'first', 'output'])
+        self.logger = TensorLogger("./RL/data/v0/", ['state', 'first', 'output'])
 
         # version 1
         # wiring = AutoNCP(16, 2)
@@ -75,15 +75,15 @@ class InvPendulumPolicyNet(PolicyNet):
             self.init_state = self.init_state * 0
 
             x = x.reshape((1, 1, -1))
-            # self.logger.append(state=x)
+            self.logger.append(state=x)
             hx = self.hx.to(x)
             x, hx = self.rnn(x, hx)
             self.hx = hx
-            # self.logger.append(first=x)
+            self.logger.append(first=x)
             x = x.reshape(1, -1)
 
             x = self.output(x)
-            # self.logger.append(output=x)
+            self.logger.append(output=x)
 
         return x
 
