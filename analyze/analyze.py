@@ -4,18 +4,20 @@ from pca import PCA
 from plot import plot
 
 
-base_addr = "../RL/data/v8"
+base_addr = "../RL/data/v9"
 
 # state = np.load(f"{base_addr}/state.npy")
 # first = np.load(f"{base_addr}/sensory.npy")
 # second = np.load(f"{base_addr}/command.npy")
 # last = np.load(f"{base_addr}/output.npy")
 state = np.load(f"{base_addr}/state.npy")
-first = np.load(f"{base_addr}/first.npy")
+# first = np.load(f"{base_addr}/first.npy")
 # second = np.load(f"{base_addr}/second.npy")
 last = np.load(f"{base_addr}/output.npy")
 
-print(state.shape, first.shape, last.shape)
+print(np.mean(last, axis=0))
+
+print(state.shape, last.shape)
 # print(state.shape, first.shape, second.shape, last.shape)
 
 # components, eigenvalues = PCA(first[:5000].reshape(-1, 3), n_components=3)
@@ -27,9 +29,10 @@ print(state.shape, first.shape, last.shape)
 
 # second_elements = first.reshape(-1, 7) @ components.T
 
-plot(np.arange(100,5000), state[100:5000, 0, 0, 1], first[100:5000, 0, 0, 0], ylim=(-0.6, 0.6))
-plot(np.arange(100,5000), state[100:5000, 0, 0, 1], first[100:5000, 0, 0, 1], ylim=(-0.6, 0.6))
-plot(np.arange(100,5000), state[100:5000, 0, 0, 1], first[100:5000, 0, 0, 2], ylim=(-0.6, 0.6))
+plot(np.arange(100,4000), state[100:4000, 0, 1], last[100:4000, 0, 0], ylim=(-0.6, 0.6))
+plot(np.arange(100,4000), state[100:4000, 0, 1], last[100:4000, 0, 1], ylim=(-0.6, 0.6))
+plot(np.arange(100,4000), state[100:4000, 0, 1], last[100:4000, 0, 8], ylim=(-0.6, 0.6))
+plot(np.arange(100,4000), state[100:4000, 0, 1], last[100:4000, 0, 9], ylim=(-0.6, 0.6))
 # plot(np.arange(100,5000), state[100:5000, 0, 0, 1], first[100:5000, 0, 0, 3], ylim=(-0.6, 0.6))
 # plot(np.arange(100,5000), state[100:5000, 0, 0, 1], first[100:5000, 0, 0, 4], ylim=(-0.6, 0.6))
 # plot(np.arange(100,5000), state[100:5000, 0, 0, 1], first[100:5000, 0, 0, 5], ylim=(-0.6, 0.6))

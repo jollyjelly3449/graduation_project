@@ -17,7 +17,7 @@ class InvPendulumPolicyNet(PolicyNet):
             nn.Linear(128, 24)
         )
 
-        # self.logger = TensorLogger("./RL/data/mlp_v0/", slots=["state", "first", "second", "output"])
+        self.logger = TensorLogger("./RL/data/mlp_v0/", slots=["state", "output"])
 
         # self.rnn = nn.RNN(input_size=4, hidden_size=128, num_layers=3)
         # self.output = nn.Sequential(
@@ -26,7 +26,9 @@ class InvPendulumPolicyNet(PolicyNet):
         # )
 
     def forward(self, x):
+        # x = x * 0 + 1
         y = self.model(x)
+        self.logger.append(state=x, output=y)
         return y
 
 

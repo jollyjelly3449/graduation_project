@@ -33,17 +33,17 @@ class InvPendulumPolicyNet(PolicyNet):
         )
         # version 0
         # self.rnn = CfC(input_size=4, units=50, batch_first=False) #nn.RNN(input_size=4, hidden_size=128, num_layers=3)
-        self.output = nn.Sequential(
-             nn.ReLU(),
-             nn.Linear(3, 2)
-        )
+        # self.output = nn.Sequential(
+        #      nn.ReLU(),
+        #      nn.Linear(3, 2)
+        # )
         self.logger = TensorLogger("./RL/data/v0/", ['state', 'first', 'output'])
 
         # version 1
         # wiring = AutoNCP(16, 2)
 
         # version 2
-        self.wiring = AutoNCP(20, 3, seed=22222)
+        self.wiring = AutoNCP(20, 2)
         self.rnn = CfC(input_size=4, units=self.wiring, batch_first=False)
 
         # self.rnn = nn.RNN(4, 20, batch_first=False)
@@ -69,7 +69,7 @@ class InvPendulumPolicyNet(PolicyNet):
 
             x = torch.cat(outputs)
 
-            x = self.output(x)
+            # x = self.output(x)
 
         else:
             self.init_state = self.init_state * 0
@@ -82,8 +82,8 @@ class InvPendulumPolicyNet(PolicyNet):
             self.logger.append(first=x)
             x = x.reshape(1, -1)
 
-            x = self.output(x)
-            self.logger.append(output=x)
+            # x = self.output(x)
+            # self.logger.append(output=x)
 
         return x
 

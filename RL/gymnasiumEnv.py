@@ -20,6 +20,10 @@ class GymnasiumEnvironment(rl.Environment):
         self.episode_reward = 0
         self.discount_reward = 0
 
+        self.action = 0
+        self.last_action = 0
+        self.energy = 0
+
         self.reset_params()
 
     def convert_space(self, gym_space):
@@ -39,21 +43,29 @@ class GymnasiumEnvironment(rl.Environment):
         self.gym_reward = reward
         end = terminated or truncated
 
+        print(action)
+
         return observation, end
 
     def reward(self, state, action, next_state):
-        # print(self.gym_reward)
-        self.episode_reward += self.gym_reward - 2 * abs(state[0])
-        self.discount_reward = self.discount_reward * self.discount_factor + self.gym_reward
+        self.energy = self.energy * 0.9 + (float(action) - self.last_action) ** 2
+        self.last_action = float(action)
 
-        # print(state, self.gym_reward - state[0] ** 2)
+        reward = self.gym_reward - 2 * abs(state[0]) - self.energy / 100
 
-        return self.gym_reward - 2 * abs(state[0])
+        self.episode_reward += reward
+        self.discount_reward = self.discount_reward * self.discount_factor + reward
+
+        return reward
 
     def reset_params(self):
         self.gym_reward = 0
         self.episode_reward = 0
         self.discount_reward = 0
+
+        self.action = 0
+        self.last_action = 0
+        self.energy = 0
 
         observation, info = self.env.reset(seed=self.seed)
         self.init_state(observation)

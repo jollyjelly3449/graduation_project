@@ -7,17 +7,17 @@ from tensor_logger import TensorLogger
 
 class InvPendulumPolicyNet(PolicyNet):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, hx=torch.zeros((3, 1, 128)), init_state=np.array([1]), **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.model = nn.Sequential(
             nn.Linear(4, 11),
             nn.ReLU(),
-            nn.Linear(11, 7),
+            nn.Linear(11,7),
             nn.ReLU(),
-            nn.Linear(7, 2)
+            nn.Linear(7,2)
         )
 
-        self.logger = TensorLogger("./RL/data/mlp_v0/", slots=["state", "first", "second", "output"])
+        # self.logger = TensorLogger("./RL/data/mlp_v0/", slots=["state", "first", "second", "output"])
 
         # self.rnn = nn.RNN(input_size=4, hidden_size=128, num_layers=3)
         # self.output = nn.Sequential(
@@ -26,18 +26,18 @@ class InvPendulumPolicyNet(PolicyNet):
         # )
 
     def forward(self, x):
-        self.logger.append(state=x)
+        # self.logger.append(state=x)
         # x = self.model(x)
-        linear1, relu1, linear2, relu2, linear3 = self.model.children()
+        # linear1, relu1, linear2, relu2, linear3 = self.model.children()
 
-        x = linear1(x)
-        self.logger.append(first=x)
-
-        x = linear2(relu1(x))
-        self.logger.append(second=x)
-
-        x = linear3(relu2(x))
-        self.logger.append(output=x)
+        x = self.model(x)
+        # self.logger.append(first=x)
+        #
+        # x = linear2(relu1(x))
+        # self.logger.append(second=x)
+        #
+        # x = linear3(relu2(x))
+        # self.logger.append(output=x)
 
         # if x.shape[0] != 1:
         #     outputs = []
