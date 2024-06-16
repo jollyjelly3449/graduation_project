@@ -6,7 +6,8 @@ from InvPendulumNCPNets import InvPendulumPolicyNet
 
 
 net = InvPendulumPolicyNet()
-net.load_state_dict(torch.load("./saved/InvPendulumPPO_NCP_pi_12.pth"))
+net.load_state_dict(torch.load("./saved/InvPendulumPPO_NCP_pi_5.pth"))
+
 
 wiring = net.rnn.wiring
 

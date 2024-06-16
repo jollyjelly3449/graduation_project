@@ -17,9 +17,8 @@ import torch
 from torch import nn
 from typing import Optional, Union
 import ncps
-from ncps.torch import CfCCell# , WiredCfCCell
 from ncps.torch.lstm import LSTMCell
-from . import WiredCfCCell
+from . import WiredCfCCell, CfCCell
 
 
 class CfC(nn.Module):
