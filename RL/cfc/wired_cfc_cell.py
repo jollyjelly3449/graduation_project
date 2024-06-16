@@ -6,9 +6,10 @@ import numpy as np
 import torch
 from torch import nn
 
-from ncps.torch import CfCCell
+# from ncps.torch import CfCCell
 from typing import Optional, Union
 
+from . import CfCCell
 from tensor_logger import TensorLogger
 
 
@@ -35,14 +36,17 @@ class WiredCfCCell(nn.Module):
             hidden_units = self._wiring.get_neurons_of_layer(l)
             if l == 0:
                 input_sparsity = self._wiring.sensory_adjacency_matrix[:, hidden_units]
+                to_hidden = self._wiring.adjacency_matrix[:, hidden_units]
+                recurrent_sparsity = to_hidden[hidden_units, :]
             else:
                 prev_layer_neurons = self._wiring.get_neurons_of_layer(l - 1)
-                input_sparsity = self._wiring.adjacency_matrix[:, hidden_units]
-                input_sparsity = input_sparsity[prev_layer_neurons, :]
+                to_hidden = self._wiring.adjacency_matrix[:, hidden_units]
+                input_sparsity = to_hidden[prev_layer_neurons, :]
+                recurrent_sparsity = to_hidden[hidden_units, :]
             input_sparsity = np.concatenate(
                 [
                     input_sparsity,
-                    np.ones((len(hidden_units), len(hidden_units))),
+                    recurrent_sparsity
                 ],
                 axis=0,
             )
@@ -106,6 +110,7 @@ class WiredCfCCell(nn.Module):
         inputs = input
         for i in range(self.num_layers):
             h, _ = self._layers[i].forward(inputs, h_state[i], timespans)
+
             inputs = h
             if input.shape[0] == 1:
                 if i == 0:

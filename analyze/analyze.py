@@ -2,9 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pca import PCA
 from plot import *
+from pid import *
 
 
-base_addr = "../RL/data/v6"
+base_addr = "../RL/data/v5"
 
 state = np.load(f"{base_addr}/state.npy")
 first = np.load(f"{base_addr}/sensory.npy")
@@ -42,8 +43,8 @@ last_data = last[:length, 0]
 
 vals = [(second[630:720, 0, i] + second[631:721, 0, i])/2 for i in [0,1,2]]
 
-for val in vals:
-    doubleplot(np.arange(630, 720), state[630:720, 0, 1], val, 'timestep', 'angle error(rad)', 'activation')
+# for val in vals:
+    # doubleplot(np.arange(630, 720), state[630:720, 0, 1], val, 'timestep', 'angle error(rad)', 'activation')
 
 # plot(np.arange(4000), state[:4000, 0, 1], last[100:4000, 0, 1], ylim=(-0.6, 0.6))
 # plot(np.arange(100,4000), state[100:4000, 0, 1], last[100:4000, 0, 8], ylim=(-0.6, 0.6))
@@ -66,7 +67,33 @@ for val in vals:
 # plt.scatter(state[:5000, 0, 0], second[:5000, 0, 10])
 
 
-plt.show()
+# plt.show()
+
+for i in range(7):
+    fig = plt.figure()
+
+    fig.canvas.manager.set_window_title(f"command cell {i}")
+
+    data = second[:1000, 0, i]
+    plt.plot(((data[2:] + data[1:-1])/2)[330:420], label="original")
+    k = pid(state, data)
+    k_p = k.copy()
+    k_d = k.copy()
+    k_p[2:4] = 0
+    k_d[:2] = 0
+
+    y_all = pid_plot(state, data, k)
+    y_p = pid_plot(state, data, k_p)
+    y_d = pid_plot(state, data, k_d)
+
+    plt.plot(y_all[330:420], label="recon(p+d)")
+    plt.title(f"command cell {i}")
+    plt.plot(y_p[330:420], label="proportional")
+    # plt.plot(y_d, label="derivative")
+
+    plt.legend()
+    plt.savefig(f"C:\\Users\\marks\\Documents\\PyCharm\\graduation_project\\RL\\image\\plot_pd\\command cell {i}")
+    plt.show()
 
 # D : 0, 2, 5
 # P : 1, 3, 6

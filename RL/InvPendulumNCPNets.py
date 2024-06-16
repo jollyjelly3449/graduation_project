@@ -22,7 +22,7 @@ from tensor_logger import TensorLogger
 
 class InvPendulumPolicyNet(PolicyNet):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, hx=torch.zeros((1, 10)), init_state=np.array([1]), **kwargs)
+        super().__init__(*args, hx=torch.zeros((1, 20)), init_state=np.array([1]), **kwargs)
 
         self.model = nn.Sequential(
             nn.Linear(4, 128),
@@ -43,7 +43,7 @@ class InvPendulumPolicyNet(PolicyNet):
         # wiring = AutoNCP(16, 2)
 
         # version 2
-        self.wiring = AutoNCP(10, 2)
+        self.wiring = AutoNCP(20, 2)
         self.rnn = CfC(input_size=4, units=self.wiring, batch_first=False)
 
         # self.rnn = nn.RNN(4, 20, batch_first=False)

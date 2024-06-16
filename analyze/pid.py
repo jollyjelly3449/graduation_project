@@ -4,11 +4,11 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 
 
-base_addr = "../RL/data/v6"
+base_addr = "../RL/data/v5"
 
 state = np.load(f"{base_addr}/state.npy")
 # first = np.load(f"{base_addr}/sensory.npy")
-# second = np.load(f"{base_addr}/command.npy")
+second = np.load(f"{base_addr}/command.npy")
 last = np.load(f"{base_addr}/output.npy")
 
 # pos = state[:5000, 0, 0]
@@ -16,44 +16,89 @@ last = np.load(f"{base_addr}/output.npy")
 
 dt = 0.02
 
-p = state[1:1000, 0, :2].copy()
-i = state[1:1000, 0, :2].copy()
-d = state[1:1000, 0, 2:].copy()
+def pid(state, value):
+    p = state[1:1000, 0, :2].copy()
+    i = state[1:1000, 0, :2].copy()
+    d = state[1:1000, 0, 2:].copy()
 
-# p = angle[1:].copy()
-# i = angle[1:].copy()
-# d = (angle[1:].copy() - angle[:-1])
-#
-# pp = pos[1:].copy() / 1000
-# pi = pos[1:].copy() / 1000
-# pd = (pos[1:].copy() - pos[:-1]) / 1000
+    p = (p[1:] + p[:-1]) / 2
+    i = (i[1:] + i[:-1]) / 2
+    d = (d[1:] + d[:-1]) / 2
+    c = i * 0 + 1
+    c = c[:,:1]
 
-sum = 0
-for index in range(i.shape[0]):
-    sum = sum * 0.9 + p[index] * dt
-    i[index] = sum
+    # p = angle[1:].copy()
+    # i = angle[1:].copy()
+    # d = (angle[1:].copy() - angle[:-1])
+    #
+    # pp = pos[1:].copy() / 1000
+    # pi = pos[1:].copy() / 1000
+    # pd = (pos[1:].copy() - pos[:-1]) / 1000
 
-# plt.plot(p)
-# plt.plot(i)
-# plt.plot(d)
+    sum = 0
+    for index in range(i.shape[0]):
+        sum = sum * 0.9 + p[index] * dt
+        i[index] = sum
 
-true = last[1:1000, 0, 0]
-plt.plot(true)
+    # plt.plot(p)
+    # plt.plot(i)
+    # plt.plot(d)
 
-# k_p = np.zeros(2)
-# k_i = np.zeros(2)
-# k_d = np.zeros(2)
+    true = value[1:999]
+    # plt.plot(true)
 
-k_p = np.array([0.10915335, 1.08076929])
-k_i = np.array([-0.00489503,  0.01869387])
-k_d = np.array([0.1660981,  0.28244076])
+    # k_p = np.zeros(2)
+    # k_i = np.zeros(2)
+    # k_d = np.zeros(2)
 
-x = np.concatenate([p, d], axis=1)
-y = true
+    # k_p = np.array([0.10915335, 1.08076929])
+    # k_i = np.array([-0.00489503,  0.01869387])
+    # k_d = np.array([0.1660981,  0.28244076])
 
-w = np.linalg.solve(x.T@x, x.T@y)
+    x = np.concatenate([p, d, c], axis=1)
+    y = true
 
-print(w)
+    w = np.linalg.solve(x.T@x, x.T@y)
+
+    return w
+
+def pid_plot(state, value, pid):
+    p = state[1:1000, 0, :2].copy()
+    i = state[1:1000, 0, :2].copy()
+    d = state[1:1000, 0, 2:].copy()
+
+    p = (p[1:] + p[:-1]) / 2
+    i = (i[1:] + i[:-1]) / 2
+    d = (d[1:] + d[:-1]) / 2
+    c = i * 0 + 1
+    c = c[:,:1]
+
+    # p = angle[1:].copy()
+    # i = angle[1:].copy()
+    # d = (angle[1:].copy() - angle[:-1])
+    #
+    # pp = pos[1:].copy() / 1000
+    # pi = pos[1:].copy() / 1000
+    # pd = (pos[1:].copy() - pos[:-1]) / 1000
+
+    sum = 0
+    for index in range(i.shape[0]):
+        sum = sum * 0.9 + p[index] * dt
+        i[index] = sum
+
+    # plt.plot(p)
+    # plt.plot(i)
+    # plt.plot(d)
+
+    true = value[1:999]
+    # plt.plot(true)
+
+    x = np.concatenate([p, d, c], axis=1)
+    y = true
+
+    x = x @ pid
+
+    return x
 
 # k_pp = 0
 # k_pi = 0
@@ -79,6 +124,14 @@ print(w)
 #
 #     print(loss)
 
-# plt.plot(pred)
-plt.show()
-
+# plt.plot(pred
+# l = pid(state, second[:,0,0])
+# print(l)
+# print(pid(state, second[:,0,1]))
+# print(pid(state, second[:,0,2]))
+# print(pid(state, second[:,0,3]))
+# print(pid(state, second[:,0,4]))
+# print(pid(state, second[:,0,5]))
+# print(pid(state, second[:,0,6]))
+#
+# print(pid_plot(state, second[:, 0, 0], l))
