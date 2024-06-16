@@ -10,14 +10,14 @@ class InvPendulumPolicyNet(PolicyNet):
         super().__init__(*args, sum=np.array([0,0]), **kwargs)
 
         self.model = nn.Sequential(
-            nn.Linear(4, 5),
+            nn.Linear(4, 11),
             nn.ReLU(),
-            nn.Linear(5,3),
+            nn.Linear(11,7),
             nn.ReLU(),
-            nn.Linear(3,2)
+            nn.Linear(7,2)
         )
 
-        self.logger = TensorLogger("./RL/data/mlp_v0/", slots=["state", "output"])
+        # self.logger = TensorLogger("./RL/data/mlp_v0/", slots=["state", "output"])
 
         # self.rnn = nn.RNN(input_size=4, hidden_size=128, num_layers=3)
         # self.output = nn.Sequential(
@@ -26,23 +26,23 @@ class InvPendulumPolicyNet(PolicyNet):
         # )
 
     def forward(self, x):
-        print("pid!")
-        self.logger.append(state=x)
-        x = self.model(x)
+        # print("pid!")
+        # self.logger.append(state=x)
+        # x = self.model(x)
         # linear1, relu1, linear2, relu2, linear3 = self.model.children()
         self.sum = self.sum * 0.9 + x[0, :2].detach().cpu().numpy() * 0.02
         # x = self.model(x)
         # x = (x * torch.tensor([0.30257425, 2.2337036,  0.3474976,  0.3868848]).to(x)).sum()
-        # x = (x * torch.tensor([-0.567695, 10.017549,  4.235533, 2.7435687]).to(x)).sum()
+        x = (x * torch.tensor([-0.567695, 10.017549,  4.235533, 2.7435687]).to(x)).sum()
         # x = (x * torch.tensor([0.7174523, 2.5525918, 0.04922304, 0.26647952]).to(x)).sum() + self.sum.T @ np.array([-3.6145527, 0.90431637])
-        # x = torch.tensor([x,x]).reshape(2)
+        x = torch.tensor([x,x]).reshape(2)
         # self.logger.append(first=x)
         #
         # x = linear2(relu1(x))
         # self.logger.append(second=x)
         #
         # x = linear3(relu2(x))
-        self.logger.append(output=x)
+        # self.logger.append(output=x)
 
         # if x.shape[0] != 1:
         #     outputs = []

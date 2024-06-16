@@ -4,7 +4,7 @@ from pca import PCA
 from plot import *
 
 
-base_addr = "../RL/data/v5"
+base_addr = "../RL/data/v6"
 
 state = np.load(f"{base_addr}/state.npy")
 first = np.load(f"{base_addr}/sensory.npy")
@@ -40,11 +40,10 @@ last_data = last[:length, 0]
 # plot(np.arange(550,900), state[550:900, 0, 1], second[550:900, 0, 0], ylim=(-0.07, 0.03))
 # plot(np.arange(550,900), state[550:900, 0, 1], second[550:900, 0, 2], ylim=(-0.07, 0.03))
 
-val0 = (second[630:720, 0, 0] + second[629:719, 0, 0])/2
-val2 = (second[630:720, 0, 2] + second[629:719, 0, 2])/2
+vals = [(second[630:720, 0, i] + second[631:721, 0, i])/2 for i in [0,1,2]]
 
-doubleplot(np.arange(630, 720), state[630:720, 0, 1], val0, 'timestep', 'angle error(rad)', 'activation')
-doubleplot(np.arange(630, 720), state[630:720, 0, 1], val2, 'timestep', 'angle error(rad)', 'activation')
+for val in vals:
+    doubleplot(np.arange(630, 720), state[630:720, 0, 1], val, 'timestep', 'angle error(rad)', 'activation')
 
 # plot(np.arange(4000), state[:4000, 0, 1], last[100:4000, 0, 1], ylim=(-0.6, 0.6))
 # plot(np.arange(100,4000), state[100:4000, 0, 1], last[100:4000, 0, 8], ylim=(-0.6, 0.6))

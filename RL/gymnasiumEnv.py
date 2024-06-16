@@ -43,7 +43,7 @@ class GymnasiumEnvironment(rl.Environment):
         self.gym_reward = reward
         end = terminated or truncated
 
-        print(action)
+        # print(action)
 
         return observation, end
 
