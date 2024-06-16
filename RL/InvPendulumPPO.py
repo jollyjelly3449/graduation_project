@@ -5,7 +5,8 @@ import RLFramework as rl
 from gymnasiumEnv import GymnasiumEnvironment
 from InvPendulumNCPNets import *
 
-env = GymnasiumEnvironment("InvertedPendulum-v4")#, render_mode='human')
+# env = GymnasiumEnvironment("InvertedPendulum-v4")
+env = GymnasiumEnvironment("InvertedPendulum-v4", render_mode='human')
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
@@ -30,16 +31,17 @@ trainer = rl.Trainer(
                                              lamda=0.95, entropy_weight=0.005, use_target_v=True, random_sample=False)
     ],
     logger=rl.utils.Logger(realtime_plot=True,
-                           rewards={"reward_sum": "env.episode_reward"}, #, "decay_reward": "env.discount_reward"},
+                           # rewards={"reward_sum": "env.episode_reward"}, #, "decay_reward": "env.discount_reward"},
+                            rewards={"reward_sum": "env.episode_reward", "decay_reward": "env.discount_reward"},
                            window_size=1000),
     pi=policy,
     v=value,
     memory=rl.traj.VolatileMemory()
 )
 
-trainer.load("./saved/InvPendulumPPO_NCP", version=10)
+trainer.load("./saved/InvPendulumPPO_NCP", version=13)
 
-trainer.add_interval(trainer.train, episode=4, step=2000)
+trainer.add_interval(trainer.train, episode=4, step=500)
 trainer.add_interval(value.update_target_network, step=1)
 
 # rand_seed = np.array([-1.27929788, -0.01545778, -0.90460136, 1.66914875, 0.48203259,
@@ -74,17 +76,17 @@ def random_action():
     index += 1
 
 
-# trainer.add_interval(random_action, step=250)
-# trainer.add_interval(random_position, step=450)
+trainer.add_interval(random_action, step=250)
+trainer.add_interval(random_position, step=450)
 
-trainer.run(test_mode=False)
+trainer.run(test_mode=True)
 # print("average reward:")
 # print(sum(trainer.logger.plots["rewards"]["reward_sum"][-5:]) / 5)
 
 env.env.close()
 
-trainer.save("./saved/InvPendulumPPO_NCP", version=10)
-# policy.rnn.rnn_cell.logger.save("./RL/data/v5_2/")
+# trainer.save("./saved/InvPendulumPPO_NCP", version=13)
+# policy.rnn.rnn_cell.logger.save("./save_data/v12/")
 # policy.logger.save("./data/e_v1_pid_fixed/")
 
 # version 7 : reward penalty is action ** 2 * 0.9

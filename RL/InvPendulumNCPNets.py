@@ -44,13 +44,13 @@ class InvPendulumPolicyNet(PolicyNet):
 
         # version 2
         self.wiring = AutoNCP(10, 2)
-        self.rnn = CfC(input_size=4, units=self.wiring, batch_first=False)
+        self.rnn = CfC(input_size=2, units=self.wiring, batch_first=False)
 
         # self.rnn = nn.RNN(4, 20, batch_first=False)
 
     def forward(self, x):
         # x = self.model
-        # x = x[:, :2]
+        x = x[:, :2]
         if x.shape[0] != 1:
             outputs = []
             last_index = 0
