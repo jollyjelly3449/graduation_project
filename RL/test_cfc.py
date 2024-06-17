@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 import seaborn as sns
+from RL.SetCustomConnection import MatchWiring
 
 from InvPendulumNCPNets import InvPendulumPolicyNet
 
@@ -10,10 +11,14 @@ torch.manual_seed(0)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
-# state_dict = torch.load("./saved/InvPendulumPPO_NCP_pi_5.pth")
+state_dict = torch.load("./saved/InvPendulumPPO_NCP_pi_5.pth")
 
 net = InvPendulumPolicyNet().to(device=device)
-# net.load_state_dict(state_dict)
+net.load_state_dict(state_dict)
+
+MatchWiring(net.rnn)
+
+# state_dict = net.state_dict()
 
 test_data = torch.rand(5,1,4).to(device)
 
